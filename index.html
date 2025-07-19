@@ -30,6 +30,17 @@
       to { background-position: 10000px 10000px; }
     }
 
+    .title {
+      position: absolute;
+      top: 40px;
+      width: 100%;
+      text-align: center;
+      font-size: 2.5rem;
+      font-weight: 600;
+      z-index: 2;
+      letter-spacing: 2px;
+    }
+
     .container {
       position: relative;
       width: 100%;
@@ -55,12 +66,13 @@
 
     .message {
       position: absolute;
-      top: 50%;
+      bottom: 80px;
       left: 50%;
-      transform: translate(-50%, -50%);
+      transform: translateX(-50%);
       font-size: 1.5rem;
       text-align: center;
       display: none;
+      z-index: 2;
     }
 
     canvas {
@@ -74,6 +86,9 @@
 <body>
   <div class="stars"></div>
   <canvas id="linesCanvas"></canvas>
+
+  <div class="title">Polaris</div>
+
   <div class="container" id="container"></div>
   <div class="message" id="message">
     🎉 모든 너구리를 다 찾으셨습니다!<br/>
@@ -84,17 +99,17 @@
     const container = document.getElementById('container');
     const message = document.getElementById('message');
 
-    // 사자자리 좌표 예시 (임의로 조정 가능)
+    // 사자자리 별자리 좌표 (중앙 정렬)
     const stars = [
-      { x: 100, y: 100 },
-      { x: 140, y: 160 },
-      { x: 180, y: 120 },
-      { x: 220, y: 180 },
-      { x: 260, y: 140 },
-      { x: 300, y: 200 },
-      { x: 340, y: 160 },
-      { x: 380, y: 220 },
-      { x: 420, y: 180 }
+      { x: 500, y: 200 }, // Regulus
+      { x: 540, y: 160 },
+      { x: 580, y: 180 },
+      { x: 620, y: 220 },
+      { x: 660, y: 260 }, // Denebola
+      { x: 540, y: 240 },
+      { x: 500, y: 280 },
+      { x: 460, y: 260 },
+      { x: 480, y: 220 }
     ];
 
     let activeCount = 0;
@@ -134,4 +149,5 @@
   </script>
 </body>
 </html>
+
 
