@@ -7,147 +7,118 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet"/>
   <style>
     body {
-      margin: 0;
-      background: radial-gradient(ellipse at bottom, #0d1b2a 0%, #000000 100%);
-      font-family: 'Poppins', sans-serif;
-      overflow: hidden;
+      background-color: black;
       color: white;
-    }
-
-    .stars {
-      width: 100%;
-      height: 100%;
-      background: transparent url('https://raw.githubusercontent.com/JulianLaval/canvas-stars/master/stars.jpg') repeat;
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 0;
-      animation: moveStars 100s linear infinite;
-    }
-
-    @keyframes moveStars {
-      from { background-position: 0 0; }
-      to { background-position: 10000px 10000px; }
-    }
-
-    .title {
-      position: absolute;
-      top: 40px;
-      width: 100%;
+      font-family: sans-serif;
       text-align: center;
-      font-size: 2.5rem;
-      font-weight: 600;
-      z-index: 2;
-      letter-spacing: 2px;
     }
 
-    .container {
+    h1 {
+      margin-top: 30px;
+    }
+
+
+  .constellation {
       position: relative;
-      width: 100%;
-      height: 100vh;
-      z-index: 1;
+      width: 400px;
+      height: 400px;
+      margin: 40px auto;
+      background-color: transparent;
     }
 
     .star {
-      width: 20px;
-      height: 20px;
-      background: white;
-      border-radius: 50%;
       position: absolute;
-      cursor: pointer;
-      transition: 0.3s;
-      box-shadow: 0 0 5px #fff;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background-color: gray;
+      transition: background-color 0.3s;
     }
 
     .star.active {
-      background: gold;
+      background-color: gold;
       box-shadow: 0 0 10px gold;
     }
-
-    .message {
+    
+   .line {
       position: absolute;
-      bottom: 80px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 1.5rem;
-      text-align: center;
+      height: 2px;
+      background: white;
+      transform-origin: left center;
+    }
+
+    #reward {
       display: none;
-      z-index: 2;
+      margin-top: 30px;
     }
 
-    canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 0;
+    #reward img {
+      max-width: 300px;
+      margin-top: 20px;
     }
-  </style>
-</head>
-<body>
-  <div class="stars"></div>
-  <canvas id="linesCanvas"></canvas>
-
-  <div class="title">Polaris</div>
-
-  <div class="container" id="container"></div>
-  <div class="message" id="message">
-    🎉 모든 너구리를 다 찾으셨습니다!<br/>
-    칵테일 바에서 선물을 수령해주세요!
+  </sty다! 칵테일바에 방문해서 선물을 수령해주세요!</strong> 🎉</p>
+    <img src="reward.jpg" alt="보상 이미지">
   </div>
 
   <script>
-    const container = document.getElementById('container');
-    const message = document.getElementById('message');
+    const stars = document.querySelectorAll(".star");
+    const constellation = document.getElementById("constellation");
+    const reward = document.getElementById("reward");
 
-    // 사자자리 별자리 좌표 (중앙 정렬)
-    const stars = [
-      { x: 500, y: 200 }, // Regulus
-      { x: 540, y: 160 },
-      { x: 580, y: 180 },
-      { x: 620, y: 220 },
-      { x: 660, y: 260 }, // Denebola
-      { x: 540, y: 240 },
-      { x: 500, y: 280 },
-      { x: 460, y: 260 },
-      { x: 480, y: 220 }
+    const TOTAL_STAMPS = stars.length;
+    let stamps = parseInt(localStorage.getItem("stamps") || "0");
+
+    // 별 활성화
+    for (let i = 0; i < TOTAL_STAMPS; i++) {
+      if (i < stamps) {
+        stars[i].classList.add("active");
+      }
+    }
+
+    // 별을 선으로 연결하기 위한 위치 계산
+    function connectStars(index1, index2) {
+      const star1 = stars[index1].getBoundingClientRect();
+      const star2 = stars[index2].getBoundingClientRect();
+      const parent = constellation.getBoundingClientRect();
+
+      const x1 = star1.left + star1.width / 2 - parent.left;
+      const y1 = star1.top + star1.height / 2 - parent.top;
+      const x2 = star2.left + star2.width / 2 - parent.left;
+      const y2 = star2.top + star2.height / 2 - parent.top;
+
+      const length = Math.hypot(x2 - x1, y2 - y1);
+      const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+
+      const line = document.createElement("div");
+      line.className = "line";
+      line.style.width = `${length}px`;
+      line.style.left = `${x1}px`;
+      line.style.top = `${y1}px`;
+      line.style.transform = `rotate(${angle}deg)`;
+      constellation.appendChild(line);
+    }
+
+    // 연결할 별 인덱스 쌍 (사자자리 구조 대략적 예시)
+    const connections = [
+      [0,1], [1,2], [2,3], [3,4],
+      [4,5], [5,6], [4,7], [7,8]
     ];
 
-    let activeCount = 0;
-
-    stars.forEach((star, i) => {
-      const div = document.createElement('div');
-      div.classList.add('star');
-      div.style.left = `${star.x}px`;
-      div.style.top = `${star.y}px`;
-      div.dataset.index = i;
-      div.addEventListener('click', () => {
-        if (!div.classList.contains('active')) {
-          div.classList.add('active');
-          activeCount++;
-          if (activeCount === stars.length) {
-            message.style.display = 'block';
-          }
-        }
-      });
-      container.appendChild(div);
+    // 페이지가 모두 로드된 후 별 연결
+    window.addEventListener("load", () => {
+      connections.forEach(pair => connectStars(pair[0], pair[1]));
     });
 
-    // 선 연결
-    const canvas = document.getElementById('linesCanvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-    ctx.lineWidth = 1.5;
-
-    ctx.beginPath();
-    ctx.moveTo(stars[0].x + 10, stars[0].y + 10);
-    for (let i = 1; i < stars.length; i++) {
-      ctx.lineTo(stars[i].x + 10, stars[i].y + 10);
+    // NFC 태그 스캔 시 (여기선 자동 도장 1개 추가)
+    if (stamps < TOTAL_STAMPS) {
+      stamps++;
+      localStorage.setItem("stamps", stamps);
+      setTimeout(() => location.reload(), 300); // 갱신
     }
-    ctx.stroke();
+
+    if (stamps >= TOTAL_STAMPS) {
+      reward.style.display = "block";
+    }
   </script>
 </body>
 </html>
-
-
