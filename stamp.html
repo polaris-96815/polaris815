@@ -1,0 +1,107 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>너구리 모으기</title>
+  <style>
+    body {
+      background: radial-gradient(ellipse at center, #0b0f2e 0%, #050517 100%);
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 30px;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    .stamp-container {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      margin: 40px auto 20px;
+    }
+
+    .stamp {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 2px dashed #888;
+      background-color: rgba(255, 255, 255, 0.1);
+      position: absolute;
+      transition: background-color 0.3s, border 0.3s;
+    }
+
+    .stamp.active {
+      background-color: gold;
+      border: 2px solid gold;
+    }
+
+    #message {
+      margin-top: 30px;
+      font-size: 1.2rem;
+      display: none;
+    }
+
+    #reward-img {
+      margin-top: 20px;
+      width: 200px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>너구리 모으기</h1>
+  <p>사자자리에 너구리를 채워보세요!</p>
+
+  <div class="stamp-container" id="stampContainer"></div>
+
+  <div id="message">
+    🎉 모든 너구리를 다 찾으셨습니다!<br />
+    칵테일바로 와서 선물을 수령해주세요!
+  </div>
+
+  <img id="reward-img" src="https://cdn.pixabay.com/photo/2021/10/04/19/30/gift-6678986_1280.png" alt="선물 이미지">
+
+  <script>
+    const container = document.getElementById('stampContainer');
+    const message = document.getElementById('message');
+    const rewardImg = document.getElementById('reward-img');
+    const totalStamps = 9;
+
+    const leoPositions = [
+      [140, 20], [180, 50], [200, 100],
+      [170, 150], [120, 170], [80, 200],
+      [50, 160], [60, 110], [100, 70]
+    ];
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const scannedId = parseInt(urlParams.get('id'));
+
+    let stamps = JSON.parse(localStorage.getItem('stamps') || '[]');
+
+    if (scannedId && !stamps.includes(scannedId) && scannedId >= 1 && scannedId <= totalStamps) {
+      stamps.push(scannedId);
+      localStorage.setItem('stamps', JSON.stringify(stamps));
+    }
+
+    for (let i = 0; i < totalStamps; i++) {
+      const stamp = document.createElement('div');
+      stamp.classList.add('stamp');
+      if (stamps.includes(i + 1)) {
+        stamp.classList.add('active');
+      }
+      stamp.style.left = leoPositions[i][0] + 'px';
+      stamp.style.top = leoPositions[i][1] + 'px';
+      container.appendChild(stamp);
+    }
+
+    if (stamps.length === totalStamps) {
+      message.style.display = 'block';
+      rewardImg.style.display = 'block';
+    }
+  </script>
+</body>
+</html>
