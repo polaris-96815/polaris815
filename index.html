@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Polaris</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>별자리 도장 미션</title>
   <style>
     body {
       background-color: black;
@@ -17,8 +16,7 @@
       margin-top: 30px;
     }
 
-
-  .constellation {
+    .constellation {
       position: relative;
       width: 400px;
       height: 400px;
@@ -39,8 +37,9 @@
       background-color: gold;
       box-shadow: 0 0 10px gold;
     }
-    
-   .line {
+
+    /* 선 연결 */
+    .line {
       position: absolute;
       height: 2px;
       background: white;
@@ -56,7 +55,27 @@
       max-width: 300px;
       margin-top: 20px;
     }
-  </sty다! 칵테일바에 방문해서 선물을 수령해주세요!</strong> 🎉</p>
+  </style>
+</head>
+<body>
+  <h1>별자리 도장 미션</h1>
+  <p>방문할 때마다 별이 하나씩 빛납니다.</p>
+
+  <div class="constellation" id="constellation">
+    <!-- 9개 별 (사자자리 형태로 배치) -->
+    <div class="star" style="top: 20px; left: 180px;"></div> <!-- 0 -->
+    <div class="star" style="top: 60px; left: 230px;"></div> <!-- 1 -->
+    <div class="star" style="top: 110px; left: 200px;"></div> <!-- 2 -->
+    <div class="star" style="top: 160px; left: 240px;"></div> <!-- 3 -->
+    <div class="star" style="top: 210px; left: 190px;"></div> <!-- 4 -->
+    <div class="star" style="top: 260px; left: 150px;"></div> <!-- 5 -->
+    <div class="star" style="top: 310px; left: 180px;"></div> <!-- 6 -->
+    <div class="star" style="top: 270px; left: 230px;"></div> <!-- 7 -->
+    <div class="star" style="top: 320px; left: 260px;"></div> <!-- 8 -->
+  </div>
+
+  <div id="reward">
+    <p>🎉 <strong>축하합니다! 칵테일바에 방문해서 선물을 수령해주세요!</strong> 🎉</p>
     <img src="reward.jpg" alt="보상 이미지">
   </div>
 
