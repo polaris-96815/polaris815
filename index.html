@@ -6,22 +6,51 @@
   <title>별자리 도장 미션</title>
   <style>
     body {
-      background-color: black;
+      margin: 0;
+      background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
       color: white;
       font-family: sans-serif;
-      text-align: center;
+      overflow: hidden;
     }
 
-    h1 {
-      margin-top: 30px;
+    h1, p {
+      text-align: center;
+      margin-top: 20px;
+      z-index: 10;
+      position: relative;
+    }
+
+    .stars {
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      z-index: 1;
+      position: fixed;
+      top: 0;
+      left: 0;
+    }
+
+    .twinkle {
+      position: absolute;
+      background: white;
+      width: 2px;
+      height: 2px;
+      border-radius: 50%;
+      animation: twinkle 2s infinite ease-in-out;
+      opacity: 0.5;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
     }
 
     .constellation {
       position: relative;
       width: 400px;
       height: 400px;
-      margin: 40px auto;
-      background-color: transparent;
+      margin: 50px auto;
+      z-index: 5;
     }
 
     .star {
@@ -30,7 +59,7 @@
       height: 16px;
       border-radius: 50%;
       background-color: gray;
-      transition: background-color 0.3s;
+      transition: background-color 0.3s, box-shadow 0.3s;
     }
 
     .star.active {
@@ -38,7 +67,6 @@
       box-shadow: 0 0 10px gold;
     }
 
-    /* 선 연결 */
     .line {
       position: absolute;
       height: 2px;
@@ -48,7 +76,9 @@
 
     #reward {
       display: none;
-      margin-top: 30px;
+      text-align: center;
+      z-index: 10;
+      position: relative;
     }
 
     #reward img {
@@ -58,20 +88,21 @@
   </style>
 </head>
 <body>
+  <div class="stars" id="starfield"></div>
+
   <h1>별자리 도장 미션</h1>
   <p>방문할 때마다 별이 하나씩 빛납니다.</p>
 
   <div class="constellation" id="constellation">
-    <!-- 9개 별 (사자자리 형태로 배치) -->
-    <div class="star" style="top: 20px; left: 180px;"></div> <!-- 0 -->
-    <div class="star" style="top: 60px; left: 230px;"></div> <!-- 1 -->
-    <div class="star" style="top: 110px; left: 200px;"></div> <!-- 2 -->
-    <div class="star" style="top: 160px; left: 240px;"></div> <!-- 3 -->
-    <div class="star" style="top: 210px; left: 190px;"></div> <!-- 4 -->
-    <div class="star" style="top: 260px; left: 150px;"></div> <!-- 5 -->
-    <div class="star" style="top: 310px; left: 180px;"></div> <!-- 6 -->
-    <div class="star" style="top: 270px; left: 230px;"></div> <!-- 7 -->
-    <div class="star" style="top: 320px; left: 260px;"></div> <!-- 8 -->
+    <div class="star" style="top: 20px; left: 180px;"></div>
+    <div class="star" style="top: 60px; left: 230px;"></div>
+    <div class="star" style="top: 110px; left: 200px;"></div>
+    <div class="star" style="top: 160px; left: 240px;"></div>
+    <div class="star" style="top: 210px; left: 190px;"></div>
+    <div class="star" style="top: 260px; left: 150px;"></div>
+    <div class="star" style="top: 310px; left: 180px;"></div>
+    <div class="star" style="top: 270px; left: 230px;"></div>
+    <div class="star" style="top: 320px; left: 260px;"></div>
   </div>
 
   <div id="reward">
@@ -83,18 +114,15 @@
     const stars = document.querySelectorAll(".star");
     const constellation = document.getElementById("constellation");
     const reward = document.getElementById("reward");
-
     const TOTAL_STAMPS = stars.length;
     let stamps = parseInt(localStorage.getItem("stamps") || "0");
 
-    // 별 활성화
     for (let i = 0; i < TOTAL_STAMPS; i++) {
       if (i < stamps) {
         stars[i].classList.add("active");
       }
     }
 
-    // 별을 선으로 연결하기 위한 위치 계산
     function connectStars(index1, index2) {
       const star1 = stars[index1].getBoundingClientRect();
       const star2 = stars[index2].getBoundingClientRect();
@@ -117,27 +145,40 @@
       constellation.appendChild(line);
     }
 
-    // 연결할 별 인덱스 쌍 (사자자리 구조 대략적 예시)
     const connections = [
       [0,1], [1,2], [2,3], [3,4],
       [4,5], [5,6], [4,7], [7,8]
     ];
 
-    // 페이지가 모두 로드된 후 별 연결
     window.addEventListener("load", () => {
       connections.forEach(pair => connectStars(pair[0], pair[1]));
+      generateTwinkles();
     });
 
-    // NFC 태그 스캔 시 (여기선 자동 도장 1개 추가)
+    // 도장 누적 (NFC 대체)
     if (stamps < TOTAL_STAMPS) {
       stamps++;
       localStorage.setItem("stamps", stamps);
-      setTimeout(() => location.reload(), 300); // 갱신
+      setTimeout(() => location.reload(), 300);
     }
 
     if (stamps >= TOTAL_STAMPS) {
       reward.style.display = "block";
     }
+
+    // 무작위 반짝이는 별 배경
+    function generateTwinkles() {
+      const container = document.getElementById("starfield");
+      for (let i = 0; i < 150; i++) {
+        const star = document.createElement("div");
+        star.className = "twinkle";
+        star.style.top = `${Math.random() * 100}%`;
+        star.style.left = `${Math.random() * 100}%`;
+        star.style.animationDelay = `${Math.random() * 5}s`;
+        container.appendChild(star);
+      }
+    }
   </script>
 </body>
 </html>
+
