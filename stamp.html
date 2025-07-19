@@ -1,107 +1,136 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>너구리 모으기</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Polaris</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet"/>
   <style>
     body {
-      background: radial-gradient(ellipse at center, #0b0f2e 0%, #050517 100%);
+      margin: 0;
+      background: radial-gradient(ellipse at bottom, #0d1b2a 0%, #000000 100%);
+      font-family: 'Poppins', sans-serif;
+      overflow: hidden;
       color: white;
-      font-family: 'Segoe UI', sans-serif;
-      text-align: center;
-      padding: 30px;
     }
 
-    h1 {
-      margin-bottom: 10px;
-    }
-
-    .stamp-container {
-      position: relative;
-      width: 300px;
-      height: 300px;
-      margin: 40px auto 20px;
-    }
-
-    .stamp {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      border: 2px dashed #888;
-      background-color: rgba(255, 255, 255, 0.1);
+    .stars {
+      width: 100%;
+      height: 100%;
+      background: transparent url('https://raw.githubusercontent.com/JulianLaval/canvas-stars/master/stars.jpg') repeat;
       position: absolute;
-      transition: background-color 0.3s, border 0.3s;
+      top: 0;
+      left: 0;
+      z-index: 0;
+      animation: moveStars 100s linear infinite;
     }
 
-    .stamp.active {
-      background-color: gold;
-      border: 2px solid gold;
+    @keyframes moveStars {
+      from { background-position: 0 0; }
+      to { background-position: 10000px 10000px; }
     }
 
-    #message {
-      margin-top: 30px;
-      font-size: 1.2rem;
+    .container {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      z-index: 1;
+    }
+
+    .star {
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      position: absolute;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 0 5px #fff;
+    }
+
+    .star.active {
+      background: gold;
+      box-shadow: 0 0 10px gold;
+    }
+
+    .message {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.5rem;
+      text-align: center;
       display: none;
     }
 
-    #reward-img {
-      margin-top: 20px;
-      width: 200px;
-      display: none;
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 0;
     }
   </style>
 </head>
 <body>
-  <h1>너구리 모으기</h1>
-  <p>사자자리에 너구리를 채워보세요!</p>
-
-  <div class="stamp-container" id="stampContainer"></div>
-
-  <div id="message">
-    🎉 모든 너구리를 다 찾으셨습니다!<br />
-    칵테일바로 와서 선물을 수령해주세요!
+  <div class="stars"></div>
+  <canvas id="linesCanvas"></canvas>
+  <div class="container" id="container"></div>
+  <div class="message" id="message">
+    🎉 모든 너구리를 다 찾으셨습니다!<br/>
+    칵테일 바에서 선물을 수령해주세요!
   </div>
 
-  <img id="reward-img" src="https://cdn.pixabay.com/photo/2021/10/04/19/30/gift-6678986_1280.png" alt="선물 이미지">
-
   <script>
-    const container = document.getElementById('stampContainer');
+    const container = document.getElementById('container');
     const message = document.getElementById('message');
-    const rewardImg = document.getElementById('reward-img');
-    const totalStamps = 9;
 
-    const leoPositions = [
-      [140, 20], [180, 50], [200, 100],
-      [170, 150], [120, 170], [80, 200],
-      [50, 160], [60, 110], [100, 70]
+    // 사자자리 좌표 예시 (임의로 조정 가능)
+    const stars = [
+      { x: 100, y: 100 },
+      { x: 140, y: 160 },
+      { x: 180, y: 120 },
+      { x: 220, y: 180 },
+      { x: 260, y: 140 },
+      { x: 300, y: 200 },
+      { x: 340, y: 160 },
+      { x: 380, y: 220 },
+      { x: 420, y: 180 }
     ];
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const scannedId = parseInt(urlParams.get('id'));
+    let activeCount = 0;
 
-    let stamps = JSON.parse(localStorage.getItem('stamps') || '[]');
+    stars.forEach((star, i) => {
+      const div = document.createElement('div');
+      div.classList.add('star');
+      div.style.left = `${star.x}px`;
+      div.style.top = `${star.y}px`;
+      div.dataset.index = i;
+      div.addEventListener('click', () => {
+        if (!div.classList.contains('active')) {
+          div.classList.add('active');
+          activeCount++;
+          if (activeCount === stars.length) {
+            message.style.display = 'block';
+          }
+        }
+      });
+      container.appendChild(div);
+    });
 
-    if (scannedId && !stamps.includes(scannedId) && scannedId >= 1 && scannedId <= totalStamps) {
-      stamps.push(scannedId);
-      localStorage.setItem('stamps', JSON.stringify(stamps));
+    // 선 연결
+    const canvas = document.getElementById('linesCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+    ctx.lineWidth = 1.5;
+
+    ctx.beginPath();
+    ctx.moveTo(stars[0].x + 10, stars[0].y + 10);
+    for (let i = 1; i < stars.length; i++) {
+      ctx.lineTo(stars[i].x + 10, stars[i].y + 10);
     }
-
-    for (let i = 0; i < totalStamps; i++) {
-      const stamp = document.createElement('div');
-      stamp.classList.add('stamp');
-      if (stamps.includes(i + 1)) {
-        stamp.classList.add('active');
-      }
-      stamp.style.left = leoPositions[i][0] + 'px';
-      stamp.style.top = leoPositions[i][1] + 'px';
-      container.appendChild(stamp);
-    }
-
-    if (stamps.length === totalStamps) {
-      message.style.display = 'block';
-      rewardImg.style.display = 'block';
-    }
+    ctx.stroke();
   </script>
 </body>
 </html>
